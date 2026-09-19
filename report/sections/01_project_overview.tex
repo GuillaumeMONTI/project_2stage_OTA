@@ -1,3 +1,34 @@
 % !TeX root = ../report_project_2stage_OTA.tex
 
 \section{Project Overview}
+
+This project develops a classical two-stage CMOS OTA using the SKY130A
+open-source PDK.
+
+The intended application is a low-power analog block representative of
+PMIC and voltage-reference circuits, where DC gain, low current
+consumption, stability and supply rejection are prioritized over
+maximum speed.
+
+The design follows a specification-driven methodology. First-order
+analytical calculations are used to establish a coherent initial design
+before transistor sizing. An ideal architectural model is then used to
+study the fundamental two-stage behavior and compensation strategy
+before implementing the complete transistor-level circuit.
+
+Transistor sizing reuses the SKY130A device characterization obtained in
+the preceding \texttt{project\_carac\_sky130A} project, including
+$g_m/I_D$, $I_D/W$, intrinsic gain, threshold-voltage and saturation-voltage
+data.
+
+The design flow used throughout the project is:
+
+\begin{enumerate}
+    \item define the OTA specifications,
+    \item select the topology and bias-current architecture,
+    \item derive a first-order analytical design,
+    \item study the ideal two-stage architecture and compensation,
+    \item size the SKY130A transistors using the characterized device data,
+    \item verify and iterate at transistor level,
+    \item characterize the final OTA over the relevant operating conditions.
+\end{enumerate}

@@ -1,0 +1,501 @@
+% !TeX root = ../report_project_2stage_OTA.tex
+
+\section{First-Order Design}
+
+The OTA is first sized analytically to obtain a coherent initial operating
+point before transistor-level optimization. These calculations are intended
+as first-order design guidance rather than exact predictions of the final
+BSIM-based circuit.
+
+\subsection{Bias-Current Selection}
+
+The diode-connected PMOS \texttt{PTAIL\_0} defines the reference bias
+current
+
+\[
+I = 500~\mathrm{nA}.
+\]
+
+The first-stage PMOS current source is initially mirrored with a ratio of
+one:
+
+\[
+I_{\mathrm{PTAIL\_1}} = I = 500~\mathrm{nA}.
+\]
+
+At zero differential input, the differential-pair current therefore splits
+equally:
+
+\[
+I_{\mathrm{PDIFF\_P}}
+=
+I_{\mathrm{PDIFF\_N}}
+=
+\frac{I}{2}
+=
+250~\mathrm{nA}.
+\]
+
+The second-stage bias current is expressed as a multiple of the reference
+current:
+
+\[
+I_{\mathrm{PTAIL\_2}} = N I.
+\]
+
+The value of $N$ is derived from the required second-stage transconductance
+and stability constraints.
+
+
+\subsection{Input-Stage Transconductance}
+
+For the low-power input differential pair, an initial transconductance
+efficiency of
+
+\[
+\frac{g_m}{I_D}
+\approx
+20~\mathrm{V}^{-1}
+\]
+
+is selected.
+
+With
+
+\[
+I_D = 250~\mathrm{nA},
+\]
+
+the expected input-device transconductance is
+
+\[
+g_{m1}
+=
+\frac{g_m}{I_D}I_D
+=
+20 \times 250~\mathrm{nA}
+=
+5~\mu\mathrm{S}.
+\]
+
+
+\subsection{Miller Compensation Capacitor}
+
+For a classical Miller-compensated two-stage OTA, the unity-gain bandwidth
+is approximated by
+
+\[
+GBW
+\approx
+\frac{g_{m1}}
+     {2\pi C_{\mathrm{MILLER}}}.
+\]
+
+Using the target
+
+\[
+GBW = 1~\mathrm{MHz},
+\]
+
+the required compensation capacitance is
+
+\[
+C_{\mathrm{MILLER}}
+=
+\frac{5~\mu\mathrm{S}}
+     {2\pi \times 1~\mathrm{MHz}}
+\approx
+0.80~\mathrm{pF}.
+\]
+
+The initial compensation value is therefore
+
+\[
+\boxed{
+C_{\mathrm{MILLER}}
+\approx
+0.8~\mathrm{pF}
+}.
+\]
+
+A SKY130A MIM capacitor is used for the physical implementation of this
+component.
+
+
+\subsection{Second-Stage Transconductance}
+
+The second-stage transconductance must place the non-dominant output pole
+sufficiently above the unity-gain frequency.
+
+Using the first-order approximation
+
+\[
+\omega_{p2}
+\approx
+\frac{g_{m2}}{C_L}
+\]
+
+and targeting
+
+\[
+\omega_{p2}
+\gtrsim
+2.2\,\omega_u
+\]
+
+for approximately $60^\circ$ phase margin gives
+
+\[
+g_{m2}
+\gtrsim
+2.2\,
+g_{m1}
+\frac{C_L}
+     {C_{\mathrm{MILLER}}}.
+\]
+
+For the worst-case initial load
+
+\[
+C_L = 4~\mathrm{pF},
+\]
+
+the required second-stage transconductance is approximately
+
+\[
+g_{m2}
+\gtrsim
+2.2
+\times
+5~\mu\mathrm{S}
+\times
+\frac{4~\mathrm{pF}}
+     {0.8~\mathrm{pF}}
+=
+55~\mu\mathrm{S}.
+\]
+
+The initial target is therefore
+
+\[
+\boxed{
+g_{m2}
+\approx
+55\text{--}60~\mu\mathrm{S}
+}.
+\]
+
+
+\subsection{Second-Stage Bias Ratio}
+
+An initial second-stage current of
+
+\[
+4I = 2~\mu\mathrm{A}
+\]
+
+would require
+
+\[
+\frac{g_m}{I_D}
+\approx
+\frac{55~\mu\mathrm{S}}
+     {2~\mu\mathrm{A}}
+=
+27.5~\mathrm{V}^{-1}.
+\]
+
+This operating point is unnecessarily aggressive for the initial design.
+
+Increasing the mirror ratio to
+
+\[
+N = 6
+\]
+
+gives
+
+\[
+I_{\mathrm{PTAIL\_2}}
+=
+6I
+=
+3~\mu\mathrm{A}.
+\]
+
+The corresponding required transconductance efficiency becomes
+
+\[
+\frac{g_m}{I_D}
+\approx
+\frac{55~\mu\mathrm{S}}
+     {3~\mu\mathrm{A}}
+\approx
+18.3~\mathrm{V}^{-1},
+\]
+
+which is a more suitable initial operating region.
+
+The initial bias-current ratio is therefore selected as
+
+\[
+\boxed{
+I_{\mathrm{PTAIL\_0}}
+:
+I_{\mathrm{PTAIL\_1}}
+:
+I_{\mathrm{PTAIL\_2}}
+=
+1:1:6
+}.
+\]
+
+
+\subsection{First-Order Slew-Rate Estimate}
+
+Although slew rate is not a primary design objective, it provides a useful
+large-signal sanity check.
+
+Assuming that the first-stage bias current limits the charging or
+discharging of the Miller capacitor,
+
+\[
+SR
+\approx
+\frac{I_{\mathrm{PTAIL\_1}}}
+     {C_{\mathrm{MILLER}}}.
+\]
+
+Therefore,
+
+\[
+SR
+\approx
+\frac{500~\mathrm{nA}}
+     {0.8~\mathrm{pF}}
+\approx
+0.63~\mathrm{V/\mu s}.
+\]
+
+This value is considered sufficient as an initial estimate for the intended
+low-power precision application.
+
+\subsection{Initial Transistor Sizing}
+
+The transistor dimensions are obtained from the SKY130A device
+characterization performed in the preceding project.
+
+For each device group, the drain current, target $g_m/I_D$ and channel
+length are first selected from the circuit-level requirements. The
+characterized current density $I_D/W$ is then used to determine the
+required width.
+
+\subsubsection{Input Differential Pair}
+
+The PMOS differential pair carries
+
+\[
+I_D = 250~\mathrm{nA}
+\]
+
+per device and targets
+
+\[
+\frac{g_m}{I_D} \approx 20~\mathrm{V}^{-1}.
+\]
+
+A channel-length comparison showed that increasing the length from
+$1~\mu\mathrm{m}$ to $2~\mu\mathrm{m}$ strongly increased device area
+for comparatively limited circuit-level benefit.
+
+The initial geometry is therefore selected as
+
+\[
+\boxed{
+W_{\mathrm{PDIFF}} = 89~\mu\mathrm{m},
+\qquad
+L_{\mathrm{PDIFF}} = 1~\mu\mathrm{m}
+}.
+\]
+
+At this operating point, the characterized intrinsic gain is approximately
+
+\[
+\frac{g_m}{g_{ds}} \approx 478.
+\]
+
+
+\subsubsection{First-Stage NMOS Mirror Load}
+
+The two NMOS mirror devices also carry
+
+\[
+I_D = 250~\mathrm{nA}.
+\]
+
+A preliminary target of $g_m/I_D \approx 15~\mathrm{V}^{-1}$ resulted in
+a calculated width below the minimum practical device width.
+
+The width was therefore fixed to
+
+\[
+W = 0.42~\mu\mathrm{m},
+\]
+
+and the corresponding operating point was re-evaluated from the
+characterized data.
+
+For $L=1~\mu\mathrm{m}$, the resulting values are approximately
+
+\[
+\frac{g_m}{I_D} \approx 19.5~\mathrm{V}^{-1}
+\]
+
+and
+
+\[
+\frac{g_m}{g_{ds}} \approx 210.
+\]
+
+The initial geometry is therefore
+
+\[
+\boxed{
+W_{\mathrm{NLOAD0,1}} = 0.42~\mu\mathrm{m},
+\qquad
+L_{\mathrm{NLOAD0,1}} = 1~\mu\mathrm{m}
+}.
+\]
+
+
+\subsubsection{Second-Stage Gain Device}
+
+The NMOS second-stage gain transistor carries
+
+\[
+I_D = 3~\mu\mathrm{A}
+\]
+
+and targets
+
+\[
+\frac{g_m}{I_D} \approx 18.3~\mathrm{V}^{-1}.
+\]
+
+The characterized data showed little intrinsic-gain improvement between
+$L=1~\mu\mathrm{m}$ and $L=2~\mu\mathrm{m}$, while the required width
+approximately doubled.
+
+The selected initial geometry is therefore
+
+\[
+\boxed{
+W_{\mathrm{NLOAD2}} = 3.58~\mu\mathrm{m},
+\qquad
+L_{\mathrm{NLOAD2}} = 1~\mu\mathrm{m}
+}.
+\]
+
+
+\subsubsection{PMOS Bias Mirror}
+
+The PMOS bias devices are operated around
+
+\[
+\frac{g_m}{I_D} \approx 15~\mathrm{V}^{-1}.
+\]
+
+For the reference current of $500~\mathrm{nA}$, the selected geometry is
+
+\[
+W_{\mathrm{PTAIL0}}
+=
+W_{\mathrm{PTAIL1}}
+=
+1.76~\mu\mathrm{m},
+\qquad
+L = 1~\mu\mathrm{m}.
+\]
+
+The second-stage current source uses the same operating point and a
+$6:1$ mirror ratio:
+
+\[
+W_{\mathrm{PTAIL2}}
+=
+6 \times 1.76
+=
+10.56~\mu\mathrm{m}.
+\]
+
+
+\subsubsection{Initial Sizing Summary}
+
+\begin{table}[ht]
+    \centering
+    \caption{Initial transistor sizing obtained from first-order design and
+    SKY130A characterized device data.}
+    \label{tab:initial_sizing}
+    \begin{tabular}{lcccc}
+        \hline
+        Device & $I_D$ & $g_m/I_D$ & $W$ ($\mu$m) & $L$ ($\mu$m) \\
+        \hline
+        \texttt{PTAIL\_0} & 500 nA & 14.9 & 1.76 & 1.0 \\
+        \texttt{PTAIL\_1} & 500 nA & 14.9 & 1.76 & 1.0 \\
+        \texttt{PDIFF\_N/P} & 250 nA & 20.0 & 89.0 & 1.0 \\
+        \texttt{NLOAD\_0/1} & 250 nA & 19.5 & 0.42 & 1.0 \\
+        \texttt{PTAIL\_2} & 3 $\mu$A & 14.9 & 10.56 & 1.0 \\
+        \texttt{NLOAD\_2} & 3 $\mu$A & 18.2 & 3.58 & 1.0 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\subsection{First-Order Gain Estimate}
+
+Using the characterized output conductances at the selected operating
+points, the first-stage gain is estimated as
+
+\[
+A_{v1}
+\approx
+g_{m1}
+\left(
+r_{o,\mathrm{PDIFF}}
+\parallel
+r_{o,\mathrm{NLOAD1}}
+\right)
+\approx
+43.5~\mathrm{dB}.
+\]
+
+For the second stage,
+
+\[
+A_{v2}
+\approx
+g_{m2}
+\left(
+r_{o,\mathrm{NLOAD2}}
+\parallel
+r_{o,\mathrm{PTAIL2}}
+\right)
+\approx
+43.7~\mathrm{dB}.
+\]
+
+The expected total low-frequency gain is therefore
+
+\[
+\boxed{
+A_0
+\approx
+A_{v1}+A_{v2}
+\approx
+87~\mathrm{dB}
+}.
+\]
+
+This provides approximately $7$ dB of nominal first-order margin relative
+to the $80$ dB design target. The result will subsequently be verified
+using transistor-level simulation.
