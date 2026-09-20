@@ -55,3 +55,8 @@ The interactive GitHub Pages version will eventually be available at:
 
 Project environment initialized. OTA specifications and architecture are
 currently being defined.
+
+## Reproducible Simulation Flow
+
+See [SIMULATION_WORKFLOW.md](SIMULATION_WORKFLOW.md) for the automated
+ngspice regression, plot-generation and report-generation workflow.
