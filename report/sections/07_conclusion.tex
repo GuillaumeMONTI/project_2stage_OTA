@@ -1,3 +1,44 @@
 % !TeX root = ../report_project_2stage_OTA.tex
 
 \section{Conclusion}
+
+This project developed a low-power two-stage CMOS OTA using the SKY130A
+open-source PDK. The design progressed from first-order calculations and
+an ideal two-stage model to a transistor-level implementation. This
+approach made it possible to study the gain, pole--zero behavior, and
+Miller compensation independently before introducing device limitations
+and parasitic effects.
+
+The final OTA operates from a nominal $1.8~\mathrm{V}$ supply and draws
+approximately $4.0~\mu\mathrm{A}$, including the reference bias branch.
+With the physical compensation network
+$C_{\mathrm{MILLER}}=736.44~\mathrm{fF}$ and
+$R_{\mathrm{MILLER}}=180~\mathrm{k}\Omega$, the nominal open-loop DC gain is
+$89.73~\mathrm{dB}$. At the specified $2~\mathrm{pF}$ nominal load, the
+unity-gain frequency reaches $1.184~\mathrm{MHz}$ with a phase margin of
+$89.04^\circ$. At the maximum $4~\mathrm{pF}$ load, the phase margin
+remains $74.98^\circ$. All 45 simulated PVT conditions satisfy the hard
+gain and stability requirements, with minimum values of $87.63~\mathrm{dB}$
+DC gain, $64.69^\circ$ phase margin, and $13.76~\mathrm{dB}$ gain margin.
+
+Statistical characterization also informed the design choices. Increasing
+the area of the first-stage NMOS mirror loads reduced the nominal
+input-referred offset standard deviation from $6.125~\mathrm{mV}$ to
+$1.109~\mathrm{mV}$. Subsequent iterations showed diminishing returns,
+while reducing the capacitive loading introduced by the second-stage NMOS
+helped recover stability. The final nominal offset spread is
+$3\sigma(V_{OS})=3.33~\mathrm{mV}$; the largest value among the nine
+voltage--temperature conditions is $3.83~\mathrm{mV}$. Thus, the
+approximately $3~\mathrm{mV}$ statistical-offset objective was not fully
+met, despite the substantial improvement. The integrated output noise
+was also reduced to $120.27~\mu\mathrm{V}_{\mathrm{RMS}}$ over
+$1~\mathrm{Hz}$--$1~\mathrm{MHz}$.
+
+The remaining limitations are primarily related to physical
+implementation and verification. The reported results are schematic-level
+simulations using the available SKY130A models; no layout, extracted
+parasitics, or silicon measurements are included. A natural continuation
+would be a matching-aware layout followed by DRC, LVS, parasitic
+extraction, and post-layout characterization. This would allow the
+stability, offset, noise, and usable input/output voltage ranges to be
+reassessed with physical parasitics and layout-dependent effects.
