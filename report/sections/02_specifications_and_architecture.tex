@@ -95,6 +95,21 @@ throughout the analytical design and simulation results.
 The diode-connected device \texttt{PTAIL\_0} defines the reference
 current unit $I$.
 
+In all testbenches, the node \texttt{ibias\_500nA} is supplied by an
+ideal DC current source imposing $I=500~\mathrm{nA}$. This is a
+deliberate boundary of the project: the objective is to characterize
+the OTA core, including its transistor sizing, matching, noise, and
+Miller-compensation trade-offs, without simultaneously designing an
+external bias-current generator such as a beta multiplier. A physical
+current-reference circuit would introduce additional process, supply,
+temperature, mismatch, and startup dependencies that would obscure the
+core-level comparison. The OTA's PMOS bias-mirror transistors remain
+fully modeled and vary with the selected SKY130A corner or statistical
+sample, but the current imposed at \texttt{ibias\_500nA} is kept ideal
+and fixed. Accordingly, the reported PVT and Monte Carlo results are
+conditional on this prescribed external bias current; they do not
+represent the combined OTA and physical bias-generator performance.
+
 The first-stage current is initially defined as
 
 \[
